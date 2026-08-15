@@ -16,7 +16,7 @@ DEPENDS = " \
 
 SRC_URI = "git://github.com/eclipse-iceoryx/iceoryx2.git;protocol=https;nobranch=1"
 
-S = "${WORKDIR}/git/examples/cxx"
+S = "${UNPACKDIR}/${BP}/examples/cxx"
 
 RDEPENDS:${PN}-dev += "iceoryx2-cxx-staticdev iceoryx2-bb-cxx-dev"
 RDEPENDS:${PN} += "iceoryx2-cxx"
