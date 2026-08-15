@@ -13,12 +13,12 @@ DEPENDS = ""
 SRC_URI = "git://github.com/eclipse-iceoryx/iceoryx2.git;protocol=https;nobranch=1"
 
 
-S = "${WORKDIR}/git/iceoryx2-cmake-modules"
+S = "${UNPACKDIR}/${BP}/iceoryx2-cmake-modules"
 
 EXTRA_OECMAKE += "-DCMAKE_INSTALL_PREFIX=${D}/${exec_prefix}"
 
 BBCLASSEXTEND = "native nativesdk"
 
 do_install() {
-  cmake --install ${S}/../../build
+  cmake --install ${B}
 }
