@@ -12,7 +12,7 @@ DEPENDS = "iceoryx2 iceoryx2-cmake-modules"
 
 SRC_URI = "git://github.com/eclipse-iceoryx/iceoryx2.git;protocol=https;nobranch=1"
 
-S = "${WORKDIR}/git/iceoryx2-c"
+S = "${UNPACKDIR}/${BP}/iceoryx2-c"
 
 INSANE_SKIP:${PN} += "already-stripped"
 FILES_SOLIBSDEV = ""
@@ -31,5 +31,5 @@ do_compile[depends] += "iceoryx2:do_compile"
 do_install[depends] += "iceoryx2:do_install"
 
 do_install() {
-  cmake --install ${S}/../../build
+  cmake --install ${B}
 }
