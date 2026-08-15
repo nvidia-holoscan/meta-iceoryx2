@@ -17,7 +17,7 @@ DEPENDS = " \
 SRC_URI = "git://github.com/eclipse-iceoryx/iceoryx2.git;protocol=https;nobranch=1 \
           file://run-ptest"
 
-S = "${WORKDIR}/git/iceoryx2-bb/cxx"
+S = "${UNPACKDIR}/${BP}/iceoryx2-bb/cxx"
 
 INSANE_SKIP:${PN} += "already-stripped"
 
@@ -29,13 +29,13 @@ RDEPENDS:${PN}-dev += "${PN}-staticdev"
 BBCLASSEXTEND = "native nativesdk"
 
 do_install() {
-  cmake --install ${S}/../../../build
+  cmake --install ${B}
 }
 
 do_install_ptest() {
     install -d ${D}/${PTEST_PATH}/tests
     install -m 0755  ${B}/tests/iceoryx2-bb-cxx-tests ${D}/${PTEST_PATH}/tests
-    install -m 0755  ${S}/../../../run-ptest ${D}/${PTEST_PATH}/
+    install -m 0755  ${UNPACKDIR}/run-ptest ${D}/${PTEST_PATH}/
 }
 
 # NOTE bitbake complains about nobody providing iceoryx2-bb-cxx needed by
