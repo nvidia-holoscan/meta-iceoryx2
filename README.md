@@ -38,22 +38,36 @@ sudo apt install -y \
 
 ### Setup the Yocto build
 
-Move to your project directory and checkout the Poky distribution and switch to the `scarthgap` branch:
+Move to your project directory and clone bitbake, OpenEmbedded-core,
+meta-openembedded and this layer at their wrynose branches. The layer declares
+`LAYERSERIES_COMPAT_meta-iceoryx2 = "wrynose"` and relies on the `UNPACKDIR`
+source layout, so it will not parse against older releases.
 
 ```sh
-git clone git://git.yoctoproject.org/poky --branch scarthgap
-cd poky
+git clone -b 2.18 https://git.openembedded.org/bitbake
+git clone -b wrynose https://git.openembedded.org/openembedded-core
+git clone -b wrynose https://git.openembedded.org/meta-openembedded
+git clone -b wrynose https://github.com/eclipse-iceoryx/meta-iceoryx2.git
 ```
 
-Now source the `oe-init-build-env` and build the base system.
+Now source `oe-init-build-env`. This creates the build directory and changes
+into it; pass a path to `oe-init-build-env` to put it somewhere else.
 
 ```sh
-source oe-init-build-env
+source openembedded-core/oe-init-build-env
 ```
 
-This will also change the location to the build directory. If you don't want
-to have the build directory inside the `poky` source checkout, you can pass a
-path to `oe-init-build-env`.
+Add the layers to `conf/bblayers.conf`. meta-iceoryx2 depends on `meta-oe`,
+which also provides gTest for the C++ unit tests:
+
+```sh
+bitbake-layers add-layer ../meta-openembedded/meta-oe
+bitbake-layers add-layer ../meta-iceoryx2
+```
+
+The Rust parts of iceoryx2 are built with the `cargo` and `ptest-cargo` classes
+that OpenEmbedded-core ships, so no additional layer is needed for the Rust
+toolchain.
 
 Since Yocto can consume quite a lot of disk space, we add
 `INHERIT += "rm_work"` to `conf/local.conf`.
@@ -62,30 +76,14 @@ Since Yocto can consume quite a lot of disk space, we add
 echo 'INHERIT += "rm_work"' >> conf/local.conf
 ```
 
-Now it's time to build the base image. This can take quite some time.
+To log in to the image as `root` without a password, which the examples below
+assume, also add:
 
 ```sh
-bitbake core-image-base
+echo 'EXTRA_IMAGE_FEATURES ?= "allow-empty-password empty-root-password allow-root-login"' >> conf/local.conf
 ```
 
 ### Build iceoryx2-image-full
-
-In order to build iceoryx2, we need to add more dependencies. Navigate to the
-`poky` directory, clone `meta-openenbedded`, `meta-rust-bin` and `meta-iceoryx2` and add the layers to `conf/bblayers.conf`:
-
-```sh
-git clone https://github.com/openembedded/meta-openembedded.git --branch scarthgap
-bitbake-layers add-layer meta-openembedded/meta-oe
-
-git clone https://github.com/rust-embedded/meta-rust-bin.git
-bitbake-layers add-layer meta-rust-bin
-
-git clone https://github.com/eclipse-iceoryx/meta-iceoryx2.git
-bitbake-layers add-layer meta-iceoryx2
-```
-
-The `meta-oe` layer is needed in order to build the tests with gTest and
-the `meta-iceoryx2-bin` layer is required to build iceoryx2 itself.
 
 We are now ready to build the `iceoryx2-image-full`, which does not only
 contain the libraries and CLI tools but also the examples and tests.
