@@ -11,17 +11,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 
+# ptest-cargo appends the test invocations and the final exit to this preamble.
+
 export RUST_TEST_THREADS=1
 
 # there are some tests which are using quite a lot of file descriptors and hit the 1024 open FD limit
 ulimit -n 2048
-
-for test in ./tests/* 
-do
-    if ${test} ; then
-        echo "PASS: ${test}"
-    else
-        echo "FAIL: ${test}"
-        exit 1
-    fi
-done

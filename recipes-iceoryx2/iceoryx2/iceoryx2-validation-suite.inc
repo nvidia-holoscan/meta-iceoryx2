@@ -6,30 +6,28 @@ LICENSE = "Apache-2.0 | MIT"
 LIC_FILES_CHKSUM = "file://LICENSE-APACHE;md5=22a53954e4e0ec258dfce4391e905dac \
                     file://LICENSE-MIT;md5=b377b220f43d747efdec40d69fcaa69d"
 
-# Enable network for the compile task allowing cargo to download dependencies
-do_compile[network] = "1"
-
 DEPENDS = ""
 
 SRC_URI = "git://github.com/eclipse-iceoryx/iceoryx2.git;protocol=https;nobranch=1 \
            file://run-ptest"
 
-inherit cargo_bin ptest
+inherit ptest-cargo
 
 INSANE_SKIP:${PN} += "already-stripped"
 FILES_SOLIBSDEV = ""
 
-# This should actually be handled by meta-rust-bin most likely
-# in classes/cargo_bin.bbclass similar to Yocto Poky
-# meta/classes-recipe/rust-common.bbclass populating RUSTFLAGS
-# to prevent bitbake warnings "contains reference to TMPDIR [buildpaths]"
-# At this time, meta-rust-bin allows to pass in additional flags
-# via EXTRA_RUSTFLAGS to populate RUSTFLAGS
-RUST_DEBUG_REMAP = "--remap-path-prefix=${WORKDIR}=${TARGET_DBGSRC_DIR}"
-# See https://github.com/rust-embedded/meta-rust-bin/blob/master/classes/cargo_bin.bbclass
-# for variables to control the compilations
-EXTRA_RUSTFLAGS = "${RUST_DEBUG_REMAP}"
-EXTRA_CARGO_FLAGS = "--tests --workspace --all-targets --exclude iceoryx2-ffi-python --exclude component-tests_rust --exclude iceoryx2_tunnel_end_to_end_tests"
+# Tests that cannot pass on the target are excluded: the proc-macro crates,
+# whose tests are built for the host; the tunnel end-to-end tests, which need
+# two processes at once.
+CARGO_BUILD_FLAGS:append = " --workspace --all-targets \
+    --exclude iceoryx2-ffi-python \
+    --exclude component-tests_rust \
+    --exclude iceoryx2_tunnel_end_to_end_tests \
+    --exclude iceoryx2-ffi-macros \
+    --exclude iceoryx2-bb-derive-macros \
+    --exclude iceoryx2-bb-testing-macros"
+
+CARGO_BINDIR = "${B}/target/${CARGO_TARGET_SUBDIR}"
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -51,16 +49,8 @@ do_install() {
 }
 
 do_install_ptest() {
-    install -d ${D}/${PTEST_PATH}/tests
-    for test in ${CARGO_BINDIR}/deps/*; do
-        if [ -f "$test" ] && [ -x "$test" ] && [ "${test##*.}" != "so" ]; then
-            case "$test" in
-                *benchmark*|*component-tests_rust*|*examples_common*|*iceoryx2_cli*|*iox2-*|*iox2_*|*nostd*|*tunnel_end_to_end*|*win32*) continue ;;
-            esac
-            install -m 0755 "$test" ${D}/${PTEST_PATH}/tests
-        fi
-    done
-    install -m 0755 ${S}/../run-ptest ${D}/${PTEST_PATH}/
+    install -d ${D}/${PTEST_PATH}
+    install -m 0755 ${UNPACKDIR}/run-ptest ${D}/${PTEST_PATH}/
 }
 
 SUMMARY:iceoryx2-benchmarks = "The iceoryx2 benchmarks"
