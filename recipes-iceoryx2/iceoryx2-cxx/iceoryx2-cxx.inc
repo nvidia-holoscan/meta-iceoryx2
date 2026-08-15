@@ -8,13 +8,13 @@ LIC_FILES_CHKSUM = "file://LICENSE-APACHE;md5=22a53954e4e0ec258dfce4391e905dac \
 
 inherit cmake ptest
 
-# NOTE:: googletest requires meta-openembedded/meta-oe
 DEPENDS = " \
   iceoryx2-bb-cxx \
   iceoryx2-c \
   iceoryx2-cmake-modules \
-  googletest \
   "
+
+DEPENDS += "${@bb.utils.contains('PTEST_ENABLED', '1', 'googletest', '', d)}"
 
 SRC_URI = "git://github.com/eclipse-iceoryx/iceoryx2.git;protocol=https;nobranch=1 \
           file://run-ptest"
@@ -24,7 +24,8 @@ S = "${UNPACKDIR}/${BP}/iceoryx2-cxx"
 INSANE_SKIP:${PN} += "already-stripped"
 FILES_SOLIBSDEV = ""
 
-EXTRA_OECMAKE += "-DCMAKE_INSTALL_PREFIX=${D}/${exec_prefix} -DBUILD_TESTING=ON -DUSE_SYSTEM_GTEST=ON"
+EXTRA_OECMAKE += "-DCMAKE_INSTALL_PREFIX=${D}/${exec_prefix}"
+EXTRA_OECMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', '-DBUILD_TESTING=ON -DUSE_SYSTEM_GTEST=ON', '-DBUILD_TESTING=OFF', d)}"
 
 PACKAGES =+ "${PN}-tests"
 FILES:${PN}-staticdev += "${libdir}/libiceoryx2_cxx.a"
