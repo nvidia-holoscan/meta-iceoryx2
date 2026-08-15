@@ -138,8 +138,26 @@ if [[ ${SELECTION} == ${YES} ]]; then
         echo '' >> ${RECIPE_FULL}
         echo 'SRCREV = "'${COMMIT_HASH}'"' >> ${RECIPE_FULL}
         echo '' >> ${RECIPE_FULL}
+        if [[ $(basename ${RECIPE}) == "iceoryx2" || $(basename ${RECIPE}) == "iceoryx2-validation-suite" ]]; then
+            echo '# crate:// SRC_URI entries for this version. Required here rather than from the' >> ${RECIPE_FULL}
+            echo '# .inc because ${PV} only resolves correctly in the versioned .bb.' >> ${RECIPE_FULL}
+            echo 'require iceoryx2-crates-${PV}.inc' >> ${RECIPE_FULL}
+        fi
     done
 
+
+    # The new recipes require iceoryx2-crates-${PV}.inc, so it has to exist
+    # before bitbake can parse them and regenerate it.
+    CRATES_DIR="recipes-iceoryx2/iceoryx2"
+    git rm -q --ignore-unmatch ${CRATES_DIR}/iceoryx2-crates-*.inc
+    : > ${CRATES_DIR}/iceoryx2-crates-${RECIPE_VERSION}.inc
+    git add recipes-iceoryx2
+
+    echo -e ""
+    echo -e "${C_BLUE}INFO:${C_OFF} Now generate the crate list from the new Cargo.lock:"
+    echo -e "    bitbake -c update_crates iceoryx2"
+    echo -e "    mv -f ${CRATES_DIR}/iceoryx2-crates.inc ${CRATES_DIR}/iceoryx2-crates-${RECIPE_VERSION}.inc"
+    echo -e "    git add ${CRATES_DIR}/iceoryx2-crates-${RECIPE_VERSION}.inc"
 fi
 
 echo -e ""

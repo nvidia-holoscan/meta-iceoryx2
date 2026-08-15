@@ -6,29 +6,31 @@ LICENSE = "Apache-2.0 | MIT"
 LIC_FILES_CHKSUM = "file://LICENSE-APACHE;md5=22a53954e4e0ec258dfce4391e905dac \
                     file://LICENSE-MIT;md5=b377b220f43d747efdec40d69fcaa69d"
 
-# Enable network for the compile task allowing cargo to download dependencies
-do_compile[network] = "1"
-
 DEPENDS = ""
 
 SRC_URI = "git://github.com/eclipse-iceoryx/iceoryx2.git;protocol=https;nobranch=1"
 
-inherit cargo_bin
+inherit cargo cargo-update-recipe-crates
 
 INSANE_SKIP:${PN} += "already-stripped"
 FILES_SOLIBSDEV = ""
 
-# This should actually be handled by meta-rust-bin most likely
-# in classes/cargo_bin.bbclass similar to Yocto Poky
-# meta/classes-recipe/rust-common.bbclass populating RUSTFLAGS
-# to prevent bitbake warnings "contains reference to TMPDIR [buildpaths]"
-# At this time, meta-rust-bin allows to pass in additional flags
-# via EXTRA_RUSTFLAGS to populate RUSTFLAGS
-RUST_DEBUG_REMAP = "--remap-path-prefix=${WORKDIR}=${TARGET_DBGSRC_DIR}"
-# See https://github.com/rust-embedded/meta-rust-bin/blob/master/classes/cargo_bin.bbclass
-# for variables to control the compilations
-EXTRA_RUSTFLAGS = "${RUST_DEBUG_REMAP}"
-EXTRA_CARGO_FLAGS = " --package iceoryx2-ffi-c --package iceoryx2-cli"
+CARGO_BUILD_FLAGS:append = " --package iceoryx2-ffi-c --package iceoryx2-cli"
+
+CARGO_BINDIR = "${B}/target/${CARGO_TARGET_SUBDIR}"
+
+# integrations/ is a separate cargo workspace that neither recipe builds, so
+# keep only the crates from the root Cargo.lock in the generated list.
+python do_update_crates:append() {
+    import re
+
+    target_file = d.expand("${THISDIR}/${BPN}-crates.inc")
+    with open(target_file) as f:
+        header, *blocks = re.split(r"(?m)^(?=# from )", f.read())
+
+    with open(target_file, "w") as f:
+        f.write(header + "".join(b for b in blocks if b.startswith("# from Cargo.lock\n")))
+}
 
 BBCLASSEXTEND = "native nativesdk"
 
