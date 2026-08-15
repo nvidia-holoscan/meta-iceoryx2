@@ -19,7 +19,7 @@ DEPENDS = " \
 SRC_URI = "git://github.com/eclipse-iceoryx/iceoryx2.git;protocol=https;nobranch=1 \
           file://run-ptest"
 
-S = "${WORKDIR}/git/iceoryx2-cxx"
+S = "${UNPACKDIR}/${BP}/iceoryx2-cxx"
 
 INSANE_SKIP:${PN} += "already-stripped"
 FILES_SOLIBSDEV = ""
@@ -34,11 +34,11 @@ RDEPENDS:${PN} += "iceoryx2-c"
 BBCLASSEXTEND = "native nativesdk"
 
 do_install() {
-  cmake --install ${S}/../../build
+  cmake --install ${B}
 }
 
 do_install_ptest() {
     install -d ${D}/${PTEST_PATH}/tests
     install -m 0755  ${B}/tests/iceoryx2-cxx-tests ${D}/${PTEST_PATH}/tests
-    install -m 0755  ${S}/../../run-ptest ${D}/${PTEST_PATH}/
+    install -m 0755  ${UNPACKDIR}/run-ptest ${D}/${PTEST_PATH}/
 }
