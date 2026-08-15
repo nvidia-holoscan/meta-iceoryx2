@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 inherit core-image
 
 # NOTE: iceoryx2 and iceoryx2-bb-cxx are only available as dev/staticdev packages and therefore not listed here
-IMAGE_INSTALL:append = "\
+CORE_IMAGE_EXTRA_INSTALL += "\
   iceoryx2-cli \
   iceoryx2-benchmarks \
   iceoryx2-examples \
