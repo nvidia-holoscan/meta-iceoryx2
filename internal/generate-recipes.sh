@@ -23,7 +23,7 @@ C_BLUE='\033[1;34m'
 YES=1
 SKIP=2
 
-RECIPE_VERSION="git"
+RECIPE_VERSION=""
 HAS_RECIPE_VERSION_SET=false
 
 COMMIT_HASH=""
@@ -63,8 +63,7 @@ while (( "$#" )); do
             echo -e "    "
             echo -e "    --commit-hash <HASH>          The iceoryx2 commit has used for the recipes."
             echo -e "                                  NOTE: Must be the long commit hash with 40 characters."
-            echo -e "    --recipe-version <VERSION>    Create or overwrite recipes with the specified <VERSION>"
-            echo -e "                                  NOTE: Can be either 'git' (default) or 'x.y.z'"
+            echo -e "    --recipe-version <VERSION>    Replace the recipes with ones for <VERSION> (x.y.z)"
             echo -e ""
             exit 0
             ;;
@@ -103,7 +102,11 @@ function show_default_selector() {
     done
 }
 
-if ! [[ ${RECIPE_VERSION} == "git" || ${RECIPE_VERSION} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+if [[ ${HAS_RECIPE_VERSION_SET} == false ]];then
+    echo -e "${C_RED}ERROR:${C_OFF} No recipe version set! Please provide it with '--recipe-version <VERSION>'" >&2
+    exit 1
+fi
+if ! [[ ${RECIPE_VERSION} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo -e "${C_RED}ERROR:${C_OFF} Invalid version format for recipe version!"
     echo -e "Expected X.Y.Z (e.g., 1.2.3)! but got '${RECIPE_VERSION}'" >&2
     exit 1
@@ -121,15 +124,14 @@ fi
 
 cd $(git rev-parse --show-toplevel)
 
-if [[ ${HAS_RECIPE_VERSION_SET} == false ]];then
-    echo -e "${C_BLUE}INFO:${C_OFF} The recipe version is not set! Using ${C_YELLOW}${RECIPE_VERSION}${C_OFF} as recipes version." >&2
-fi
-
-echo -e "Shall the ${C_YELLOW}${RECIPE_VERSION}${C_OFF} recipes with iceoryx2 ${C_YELLOW}${COMMIT_HASH}${C_OFF} commit hash be created?"
+# The layer carries one version of each recipe, so the new recipes replace the
+# existing ones.
+echo -e "Shall the recipes be replaced by ${C_YELLOW}${RECIPE_VERSION}${C_OFF} ones with iceoryx2 ${C_YELLOW}${COMMIT_HASH}${C_OFF} commit hash?"
 show_default_selector
 if [[ ${SELECTION} == ${YES} ]]; then
     echo -e "Generating"
     for RECIPE in "${RECIPE_PATH_LIST[@]}"; do
+        git rm -q --ignore-unmatch "${RECIPE}"_*.bb
         RECIPE_FULL="${RECIPE}_${RECIPE_VERSION}.bb"
         echo -e "  ${RECIPE_FULL}"
         echo 'require ${BPN}.inc' > ${RECIPE_FULL}
@@ -137,15 +139,7 @@ if [[ ${SELECTION} == ${YES} ]]; then
         echo 'SRCREV = "'${COMMIT_HASH}'"' >> ${RECIPE_FULL}
         echo '' >> ${RECIPE_FULL}
     done
-fi
 
-if [[ $RECIPE_VERSION != "git" ]]; then
-    echo -e ""
-    echo -e "Shall the ${C_YELLOW}ICEORYX2_VERSION${C_OFF} in ${C_YELLOW}conf/layer.conf${C_OFF} set to ${C_YELLOW}${RECIPE_VERSION}${C_OFF}?"
-    show_default_selector
-    if [[ ${SELECTION} == ${YES} ]]; then
-        sed -i "s|^ICEORYX2_VERSION ??= .*|ICEORYX2_VERSION ??= \"${RECIPE_VERSION}\"|" conf/layer.conf
-    fi
 fi
 
 echo -e ""
