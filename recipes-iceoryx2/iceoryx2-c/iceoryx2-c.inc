@@ -21,9 +21,9 @@ FILES_SOLIBSDEV = ""
 EXTRA_OECMAKE += "-DRUST_BUILD_ARTIFACT_PATH=${STAGING_DATADIR}/iceoryx2/ffi-c"
 EXTRA_OECMAKE += "-DCMAKE_INSTALL_PREFIX=${D}/${exec_prefix}"
 
-FILES_${PN}-staticdev += "${libdir}/libiceoryx2_ffi_c.a"
+FILES:${PN}-staticdev += "${libdir}/libiceoryx2_ffi_c.a"
 FILES:${PN} += "${libdir}/libiceoryx2_ffi_c.so"
-RDEPENDS_${PN}-dev += "${PN}-staticdev"
+RDEPENDS:${PN}-dev += "${PN}-staticdev"
 BBCLASSEXTEND = "native nativesdk"
 
 do_install() {
