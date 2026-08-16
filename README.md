@@ -106,32 +106,6 @@ uncomment the desired platform from the `Machine Selection`.
 Once the build process completes, the image can be used with the
 `runqemu qemux86-64` command.
 
-## Troubleshooting
-
-In Yocto one of the main requirements is that package versions increases
-in a linear way to ensure compatibility with package managers like `rpm`.
-Since we introduced package versions in `meta-iceoryx2` layer config
-it may happen that version errors are produced while building:
-
-```sh
-ERROR: iceoryx2-cxx-0.7.0-r0 do_packagedata: QA Issue: Package version for package iceoryx2-cxx-src went backwards which would break package feeds (from 0:git-r0 to 0:0.7.0-r0) [version-going-backwards]
-```
-
-It is recommended to cleanup the build cache of the iceoryx2 packages before building the image:
-
-```sh
-bitbake -c cleanall iceoryx-hoofs-subset \
-                    iceoryx-platform-minimal \
-                    iceoryx2 \
-                    iceoryx2-validation-suite \
-                    iceoryx2-c \
-                    iceoryx2-c-examples \
-                    iceoryx2-bb-cxx \
-                    iceoryx2-cmake-modules \
-                    iceoryx2-cxx \
-                    iceoryx2-cxx-examples
-```
-
 ### Run an iceoryx2 example
 
 The examples are located under `/usr/bin/iceoryx2/examples`, with `rust`, `c` and `cxx` subfolders.
@@ -199,19 +173,3 @@ ptest-runner iceoryx2-cxx
 # For running iceoryx2-bb-cxx unit tests
 ptest-runner iceoryx2-bb-cxx
 ```
-
-## Selecting the iceoryx2 version
-
-The meta-iceoryx2 repo comes with recipes for multiple iceoryx2 versions. The
-preferred version is set to the latest iceoryx2 release as of the date of the
-meta-iceoryx2 git tag. If a different version needs to be used, e.g. an older
-version or an unreleased git version, the preferred version can be overridden
-by setting the `ICEORYX2_VERSION` variable in the `conf/local.conf` file.
-
-The `ICEORYX2_VERSION` variable is used to set the
-[PREFERRED_VERSION](https://docs.yoctoproject.org/dev/ref-manual/variables.html#term-PREFERRED_VERSION)
-for the recipes.
-
-In cases that more customization is needed, have a look at the
-[meta-iceoryx2-append-layer](examples/meta-iceoryx2-append-layer) example, which
-also shows how to set some build flags.
