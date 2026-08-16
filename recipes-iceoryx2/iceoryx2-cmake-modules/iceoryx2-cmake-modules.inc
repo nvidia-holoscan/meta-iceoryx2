@@ -2,7 +2,7 @@ SUMMARY = "iceoryx2 CMake modules"
 DESCRIPTION = "This package contains the iceoryx2 CMake modules"
 HOMEPAGE = "https://iceoryx.io"
 BUGTRACKER = "https://github.com/eclipse-iceoryx/iceoryx2/issues"
-LICENSE = "Apache-2.0 | MIT"
+LICENSE = "Apache-2.0 OR MIT"
 LIC_FILES_CHKSUM = "file://LICENSE-APACHE;md5=22a53954e4e0ec258dfce4391e905dac \
                     file://LICENSE-MIT;md5=b377b220f43d747efdec40d69fcaa69d"
 
