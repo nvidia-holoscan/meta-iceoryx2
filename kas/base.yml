@@ -1,11 +1,25 @@
 header:
   version: 18
   includes:
-    - local.yml
+    - kas/local.yml
+
+machine: qemux86-64
+distro: nodistro
+
+target: iceoryx2-image-full
+
 repos:
-  meta-rust-bin:
-    url: https://github.com/rust-embedded/meta-rust-bin.git
-    branch: master
+  meta-iceoryx2:
 
-  ../meta-iceoryx2:
-
+  bitbake:
+    url: https://git.openembedded.org/bitbake
+    layers:
+      .: disabled
+  openembedded-core:
+    url: https://git.openembedded.org/openembedded-core
+    layers:
+      meta:
+  meta-openembedded:
+    url: https://git.openembedded.org/meta-openembedded
+    layers:
+      meta-oe:

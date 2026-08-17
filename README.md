@@ -140,30 +140,21 @@ cd yocto-iceoryx2
 python3 -m venv .venv
 source .venv/bin/activate
 pip3 install kas
-git clone https://github.com/eclipse-iceoryx/meta-iceoryx2.git
+git clone -b wrynose https://github.com/eclipse-iceoryx/meta-iceoryx2.git
+kas build meta-iceoryx2/kas/wrynose.yml
 ```
 
-- build with yocto kirkstone - machine=qemux86-64
+This builds for `qemux86-64` against the wrynose branches of bitbake,
+openembedded-core and meta-openembedded. To boot the image:
 
 ```sh
-kas build meta-iceoryx2/kas/kirkstone.yml
+kas shell meta-iceoryx2/kas/wrynose.yml -c 'runqemu kvm nographic'
 ```
 
-- build with yocto scarthgap - machine=qemux86-64
+## Run the ptest suites
 
-```sh
-kas build meta-iceoryx2/kas/scarthgap.yml
-```
-
-### Run ptest with kas MACHINE qemux86-64
-
-- Bootup QEMU
-
-```sh
-kas shell meta-iceoryx2/kas/scarthgap.yml -c 'runqemu kvm nographic'
-```
-
-- Login and use ptest-runner running test cases
+The test suites are packaged as ptest and require `ptest` in `DISTRO_FEATURES`.
+Boot the image on hardware or under `runqemu`, log in as `root`, then:
 
 ```sh
 # For running iceoryx2 unit tests

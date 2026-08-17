@@ -1,0 +1,12 @@
+header:
+  version: 18
+  includes:
+    - kas/base.yml
+
+repos:
+  bitbake:
+    branch: "2.18"
+  openembedded-core:
+    branch: wrynose
+  meta-openembedded:
+    branch: wrynose

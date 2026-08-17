@@ -4,11 +4,9 @@ header:
 local_conf_header:
   base: |
     CONF_VERSION = "2"
-    SOURCE_MIRROR_URL = "http://downloads.yoctoproject.org/mirror/sources/"
     INHERIT += "buildstats buildstats-summary buildhistory"
     INHERIT += "report-error"
-    EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
-    USER_CLASSES ?= "buildstats"
+    EXTRA_IMAGE_FEATURES ?= "allow-empty-password empty-root-password allow-root-login"
     DISTRO_FEATURES:append = " ptest"
 
   diskmon: |
