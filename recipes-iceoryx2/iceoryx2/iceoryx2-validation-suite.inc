@@ -22,7 +22,7 @@ FILES_SOLIBSDEV = ""
 CARGO_BUILD_FLAGS:append = " --workspace --all-targets \
     --exclude iceoryx2-ffi-python \
     --exclude component-tests_rust \
-    --exclude iceoryx2_tunnel_end_to_end_tests \
+    --exclude iceoryx2-services-tunnel-end-to-end-tests \
     --exclude iceoryx2-ffi-macros \
     --exclude iceoryx2-bb-derive-macros \
     --exclude iceoryx2-bb-testing-macros"
