@@ -24,8 +24,6 @@ INSANE_SKIP:${PN} += "already-stripped"
 EXTRA_OECMAKE += "-DCMAKE_INSTALL_PREFIX=${D}/${exec_prefix}"
 EXTRA_OECMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', '-DBUILD_TESTING=ON -DUSE_SYSTEM_GTEST=ON', '-DBUILD_TESTING=OFF', d)}"
 
-PACKAGES =+ "${PN}-tests"
-
 BBCLASSEXTEND = "native nativesdk"
 
 do_install() {

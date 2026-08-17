@@ -27,7 +27,6 @@ FILES_SOLIBSDEV = ""
 EXTRA_OECMAKE += "-DCMAKE_INSTALL_PREFIX=${D}/${exec_prefix}"
 EXTRA_OECMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', '-DBUILD_TESTING=ON -DUSE_SYSTEM_GTEST=ON', '-DBUILD_TESTING=OFF', d)}"
 
-PACKAGES =+ "${PN}-tests"
 FILES:${PN}-staticdev += "${libdir}/libiceoryx2_cxx.a"
 FILES:${PN} += "${libdir}/libiceoryx2_cxx.so"
 RDEPENDS:${PN}-dev += "${PN}-staticdev iceoryx2-bb-cxx-dev"
