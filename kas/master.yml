@@ -1,0 +1,12 @@
+header:
+  version: 18
+  includes:
+    - kas/base.yml
+
+repos:
+  bitbake:
+    branch: master
+  openembedded-core:
+    branch: master
+  meta-openembedded:
+    branch: master
