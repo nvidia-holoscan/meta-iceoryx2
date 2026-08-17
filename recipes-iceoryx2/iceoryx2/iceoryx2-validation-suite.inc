@@ -59,6 +59,22 @@ do_install_ptest() {
     install -m 0755 ${UNPACKDIR}/run-ptest ${D}/${PTEST_PATH}/
 }
 
+# The benchmarks are bin targets, so ptest-cargo would run them as tests with
+# their default 10,000,000 iterations. They ship in iceoryx2-benchmarks instead.
+PTEST_CARGO_SKIP_BINARIES = "benchmark-event benchmark-publish-subscribe \
+                             benchmark-queue benchmark-request-response"
+
+python do_compile_ptest_cargo:append() {
+    skip = set((d.getVar("PTEST_CARGO_SKIP_BINARIES") or "").split())
+    listfile = d.getVar("CARGO_TEST_BINARIES_FILES")
+
+    with open(listfile, "r") as f:
+        keep = [l for l in f.readlines() if os.path.basename(l.strip()) not in skip]
+
+    with open(listfile, "w") as f:
+        f.writelines(keep)
+}
+
 SUMMARY:iceoryx2-benchmarks = "The iceoryx2 benchmarks"
 DESCRIPTION:iceoryx2-benchmarks = "This package contains the iceoryx2 benchmarks. \
                                 They are available in '/usr/bin/iceoryx2/benchmarks'"
