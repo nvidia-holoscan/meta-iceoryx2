@@ -1,8 +1,12 @@
 # Customize the iceoryx2 yocto recipes
 
 In order to customize the iceoryx2 build, a `meta-iceoryx2-append-layer` can be
-created. In its `conf/layer.conf`, the `ICEORYX2_VERSION` can be set to the
-desired version, if it deviates from the preferred version of the git tag.
+created next to `meta-iceoryx2` and added to `conf/bblayers.conf`.
 
-The `recipes/iceoryx2*.bbappend` files can be used to set additional flags,
-e.g. `CARGO_FEATURES:append = ",iceoryx2/dev_permissions"`.
+The `recipes/iceoryx2*_%.bbappend` files apply to whichever iceoryx2 version the
+layer provides and can be used to pass additional flags to cargo, e.g. to enable
+a feature:
+
+```
+CARGO_BUILD_FLAGS:append = " --features iceoryx2/dev_permissions"
+```
