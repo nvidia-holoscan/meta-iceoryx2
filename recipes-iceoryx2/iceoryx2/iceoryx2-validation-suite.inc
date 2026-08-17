@@ -19,12 +19,16 @@ FILES_SOLIBSDEV = ""
 # Tests that cannot pass on the target are excluded: the proc-macro crates,
 # whose tests are built for the host; iceoryx2-cli, whose tests create an
 # executable at run time; the tunnel end-to-end tests, which need two
-# processes at once.
+# processes at once; the no_std tests, which abort on their expected panics.
 CARGO_BUILD_FLAGS:append = " --workspace --all-targets \
     --exclude iceoryx2-ffi-python \
     --exclude component-tests_rust \
     --exclude iceoryx2-services-tunnel-end-to-end-tests \
     --exclude iceoryx2-cli \
+    --exclude iceoryx2-bb-container-tests-nostd \
+    --exclude iceoryx2-bb-lock-free-tests-nostd \
+    --exclude iceoryx2-bb-trait-tests-nostd \
+    --exclude iceoryx2-conformance-tests-nostd \
     --exclude iceoryx2-ffi-macros \
     --exclude iceoryx2-bb-derive-macros \
     --exclude iceoryx2-bb-testing-macros"
