@@ -169,3 +169,14 @@ ptest-runner iceoryx2-cxx
 # For running iceoryx2-bb-cxx unit tests
 ptest-runner iceoryx2-bb-cxx
 ```
+
+## Contributing
+
+Contributions are welcome as pull requests against
+https://github.com/eclipse-iceoryx/meta-iceoryx2, where the maintainers review
+them. Please sign off your commits with `git commit -s`.
+
+Source patches for the iceoryx2 upstream code belong next to the recipe that
+applies them, and each one needs an `Upstream-Status:` tag as described in the
+[OpenEmbedded patch guidelines](https://docs.yoctoproject.org/contributor-guide/recipe-style-guide.html#patch-upstream-status),
+so that the `patch-status` QA check passes.
