@@ -36,16 +36,21 @@ BBCLASSEXTEND = "native nativesdk"
 
 PACKAGES =+ "${PN}-cli"
 
-IOX2_STAGING_DIR = "${STAGING_DIR}/iceoryx2-artifacts"
+# iceoryx2-c installs and packages libiceoryx2_ffi_c and its header, so they
+# are only staged here, in the layout RUST_BUILD_ARTIFACT_PATH expects. Going
+# through the sysroot keeps them in sstate and separate per MACHINE and per
+# native/nativesdk variant.
+IOX2_FFI_C_DIR = "${datadir}/iceoryx2/ffi-c"
+
+sysroot_stage_all:append() {
+    install -d ${SYSROOT_DESTDIR}${IOX2_FFI_C_DIR}/iceoryx2-ffi-c-cbindgen/include/iox2
+    install -m 0644 ${CARGO_BINDIR}/libiceoryx2_ffi_c.a ${SYSROOT_DESTDIR}${IOX2_FFI_C_DIR}
+    install -m 0755 ${CARGO_BINDIR}/libiceoryx2_ffi_c.so ${SYSROOT_DESTDIR}${IOX2_FFI_C_DIR}
+    install -m 0644 ${CARGO_BINDIR}/iceoryx2-ffi-c-cbindgen/include/iox2/iceoryx2.h \
+        ${SYSROOT_DESTDIR}${IOX2_FFI_C_DIR}/iceoryx2-ffi-c-cbindgen/include/iox2
+}
 
 do_install() {
-    install -d ${IOX2_STAGING_DIR}
-    install ${CARGO_BINDIR}/libiceoryx2_ffi_c.a ${IOX2_STAGING_DIR}
-    install -m 0755 ${CARGO_BINDIR}/libiceoryx2_ffi_c.so ${IOX2_STAGING_DIR}
-
-    install -d ${IOX2_STAGING_DIR}/iceoryx2-ffi-c-cbindgen/include/iox2
-    install ${CARGO_BINDIR}/iceoryx2-ffi-c-cbindgen/include/iox2/iceoryx2.h ${IOX2_STAGING_DIR}/iceoryx2-ffi-c-cbindgen/include/iox2
-
     install -d ${D}${bindir}
     install -m 0755 ${CARGO_BINDIR}/iox2 ${D}${bindir}
     install -m 0755 ${CARGO_BINDIR}/iox2-config ${D}${bindir}
