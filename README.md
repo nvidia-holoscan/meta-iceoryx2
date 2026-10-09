@@ -25,16 +25,23 @@ sudo apt install -y \
     cpio \
     diffstat \
     file \
+    g++ \
     gawk \
     gcc \
     git \
     language-pack-en \
     lz4 \
-    pip \
+    make \
     python3 \
+    python3-pip \
+    python3-venv \
     wget \
+    xz-utils \
     zstd
 ```
+
+The complete list for each host distribution is in the Yocto Project
+[system requirements](https://docs.yoctoproject.org/dev/ref-manual/system-requirements.html#ubuntu-and-debian).
 
 ### Setup the Yocto build
 
