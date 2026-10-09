@@ -21,7 +21,6 @@ SRC_URI = "git://github.com/eclipse-iceoryx/iceoryx2.git;protocol=https;nobranch
 
 S = "${UNPACKDIR}/${BP}/iceoryx2-cxx"
 
-INSANE_SKIP:${PN} += "already-stripped"
 FILES_SOLIBSDEV = ""
 
 EXTRA_OECMAKE += "-DCMAKE_INSTALL_PREFIX=${D}/${exec_prefix}"
