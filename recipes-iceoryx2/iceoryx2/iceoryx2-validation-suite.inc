@@ -54,11 +54,6 @@ do_install() {
     done
 }
 
-do_install_ptest() {
-    install -d ${D}/${PTEST_PATH}
-    install -m 0755 ${UNPACKDIR}/run-ptest ${D}/${PTEST_PATH}/
-}
-
 # The benchmarks are bin targets, so ptest-cargo would run them as tests with
 # their default 10,000,000 iterations. They ship in iceoryx2-benchmarks instead.
 PTEST_CARGO_SKIP_BINARIES = "benchmark-event benchmark-publish-subscribe \
