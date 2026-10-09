@@ -2,6 +2,60 @@
 
 Yocto Layer for Eclipse iceoryx2™
 
+This layer builds [iceoryx2](https://github.com/eclipse-iceoryx/iceoryx2), the
+zero-copy inter-process communication library, version 0.9.3, with
+OpenEmbedded.
+
+## Dependencies and supported releases
+
+The layer depends on:
+
+- [openembedded-core](https://git.openembedded.org/openembedded-core)
+- `meta-oe` from [meta-openembedded](https://git.openembedded.org/meta-openembedded),
+  which also provides gTest for the C++ unit tests
+
+The `wrynose` branch follows the `wrynose` branches of these layers. The
+`master` branch provides the same recipes for oe-core master (the `blacksail`
+series).
+
+## Provided packages and images
+
+| Package | Contents |
+| --- | --- |
+| `iceoryx2-c` | C library (`libiceoryx2_ffi_c.so`) |
+| `iceoryx2-cxx` | C++ library (`libiceoryx2_cxx.so`) |
+| `iceoryx2-cli` | `iox2` command line tools |
+| `iceoryx2-examples`, `iceoryx2-c-examples`, `iceoryx2-cxx-examples` | Rust, C and C++ examples in `/usr/bin/iceoryx2/examples` |
+| `iceoryx2-benchmarks` | benchmarks in `/usr/bin/iceoryx2/benchmarks` |
+| `iceoryx2-c-dev`, `iceoryx2-cxx-dev`, `iceoryx2-bb-cxx-dev`, `iceoryx2-cmake-modules-dev` | headers and CMake package files for building applications |
+| `iceoryx2-validation-suite-ptest`, `iceoryx2-cxx-ptest`, `iceoryx2-bb-cxx-ptest` | unit tests, see [Run the ptest suites](#run-the-ptest-suites) |
+
+`iceoryx2-bb-cxx` is header-only and `iceoryx2-cmake-modules` only carries
+CMake files, so both exist only as `-dev` packages.
+
+Two example images are included:
+
+- `iceoryx2-image-minimal`: the C and C++ libraries
+- `iceoryx2-image-full`: additionally the CLI tools, examples, benchmarks and
+  unit tests
+
+## Using iceoryx2 in your own image
+
+Add the packages your application needs to the image, for example in
+`conf/local.conf`:
+
+```sh
+IMAGE_INSTALL:append = " iceoryx2-cxx iceoryx2-cli"
+```
+
+`iceoryx2-cxx` pulls in `iceoryx2-c`. A recipe that builds an application
+against iceoryx2 adds `iceoryx2-cxx` (or `iceoryx2-c`) to `DEPENDS` and finds
+it with CMake's `find_package(iceoryx2-cxx)`. For an SDK, add the matching
+`-dev` packages, e.g. `TOOLCHAIN_TARGET_TASK:append = " iceoryx2-cxx-dev"`.
+
+To pass additional options to the iceoryx2 build, such as cargo features, see
+the [example append layer](examples/meta-iceoryx2-append-layer/README.md).
+
 ## Manual setup
 
 ### Prerequisites
@@ -95,18 +149,16 @@ echo 'EXTRA_IMAGE_FEATURES ?= "allow-empty-password empty-root-password allow-ro
 We are now ready to build the `iceoryx2-image-full`, which does not only
 contain the libraries and CLI tools but also the examples and tests.
 
-For enable unit tests of iceoryx2 and iceoryx2-cxx, add to local.conf
-
-```sh
-DISTRO_FEATURES:append = " ptest"
-```
+`iceoryx2-image-full` includes the unit tests, so it needs `ptest` in
+`DISTRO_FEATURES`, which OpenEmbedded-core enables by default. If your distro
+disables it, build `iceoryx2-image-minimal` instead.
 
 ```sh
 bitbake iceoryx2-image-full
 ```
 
-By default, the `qemux86-64` image is build. To select a different image, just
-uncomment the desired platform from the `Machine Selection`.
+By default, the image is built for `qemux86-64`. To build for another machine,
+set `MACHINE` in `conf/local.conf`.
 
 Once the build process completes, the image can be used with the
 `runqemu qemux86-64` command.
@@ -115,9 +167,9 @@ Once the build process completes, the image can be used with the
 
 The examples are located under `/usr/bin/iceoryx2/examples`, with `rust`, `c` and `cxx` subfolders.
 
-When qemu is used to run the image, the user needs to login with `root` and no
-password. Once logged in, the following command can be used to run the
-publish-subscribe examples.
+When qemu is used to run the image, log in as `root` with no password (see the
+`EXTRA_IMAGE_FEATURES` step above). Once logged in, the following commands run
+the publish-subscribe examples.
 
 ```sh
 /usr/bin/iceoryx2/examples/rust/publish_subscribe_subscriber &
@@ -134,7 +186,7 @@ iox2 node list
 iox2 service list
 ```
 
-These command will list the available information about the iceoryx2 application.
+These commands list the available information about the iceoryx2 application.
 For more details about the iceoryx2 CLI, please visit https://github.com/eclipse-iceoryx/iceoryx2/tree/main/iceoryx2-cli.
 
 ## How to build iceoryx2-image-full with kas
@@ -150,11 +202,18 @@ kas build meta-iceoryx2/kas/wrynose.yml
 ```
 
 This builds for `qemux86-64` against the wrynose branches of bitbake,
-openembedded-core and meta-openembedded. To boot the image:
+openembedded-core and meta-openembedded, with `ptest` and the root login
+features already enabled. For oe-core master, check out the `master` branch
+and use `kas/master.yml` instead.
+
+To boot the image:
 
 ```sh
 kas shell meta-iceoryx2/kas/wrynose.yml -c 'runqemu kvm nographic'
 ```
+
+`kvm` needs access to `/dev/kvm`; leave it out to run without hardware
+acceleration.
 
 ## Run the ptest suites
 
@@ -180,3 +239,13 @@ Source patches for the iceoryx2 upstream code belong next to the recipe that
 applies them, and each one needs an `Upstream-Status:` tag as described in the
 [OpenEmbedded patch guidelines](https://docs.yoctoproject.org/contributor-guide/recipe-style-guide.html#patch-upstream-status),
 so that the `patch-status` QA check passes.
+
+## Security
+
+To report a vulnerability, see [SECURITY.md](SECURITY.md).
+
+## License
+
+meta-iceoryx2 is licensed under either the Apache License 2.0 or the MIT
+license, at your option. See [LICENSE-APACHE](LICENSE-APACHE) and
+[LICENSE-MIT](LICENSE-MIT).
