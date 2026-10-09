@@ -40,5 +40,4 @@ do_install() {
 do_install_ptest() {
     install -d ${D}/${PTEST_PATH}/tests
     install -m 0755  ${B}/tests/iceoryx2-cxx-tests ${D}/${PTEST_PATH}/tests
-    install -m 0755  ${UNPACKDIR}/run-ptest ${D}/${PTEST_PATH}/
 }
