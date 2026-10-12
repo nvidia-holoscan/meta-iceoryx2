@@ -1,0 +1,35 @@
+From 82761c66c44966c5496ea95401afaee22b6cfb41 Mon Sep 17 00:00:00 2001
+From: dkroenke <dkroenke@posteo.com>
+Date: Fri, 18 Sep 2026 17:32:59 +0200
+Subject: [PATCH] [#77] Reset last signal in SignalHandler tests
+
+Upstream-Status: Backport [https://github.com/eclipse-iceoryx/iceoryx2/commit/82761c66c44966c5496ea95401afaee22b6cfb41]
+Signed-off-by: Ilies CHERGUI <ichergui@nvidia.com>
+---
+ iceoryx2-bb/posix/tests-common/src/signal_tests.rs | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/iceoryx2-bb/posix/tests-common/src/signal_tests.rs b/iceoryx2-bb/posix/tests-common/src/signal_tests.rs
+index cd53fad..9e6e111 100644
+--- a/iceoryx2-bb/posix/tests-common/src/signal_tests.rs
++++ b/iceoryx2-bb/posix/tests-common/src/signal_tests.rs
+@@ -315,7 +315,8 @@ pub fn termination_requested_with_terminate_works() {
+ 
+     let _test = TestFixture::new();
+ 
+-    assert_that!(!SignalHandler::termination_requested(), eq true);
++    // reset signal for test
++    SignalHandler::last_signal();
+     assert_that!(Process::from_self().send_signal(Signal::Terminate), is_ok);
+ 
+     assert_that!(
+@@ -332,7 +333,8 @@ pub fn termination_requested_with_interrupt_works() {
+ 
+     let _test = TestFixture::new();
+ 
+-    assert_that!(SignalHandler::termination_requested(), eq false);
++    // reset signal for test
++    SignalHandler::last_signal();
+     assert_that!(Process::from_self().send_signal(Signal::Interrupt), is_ok);
+ 
+     assert_that!(
